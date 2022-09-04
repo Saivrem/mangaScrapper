@@ -17,7 +17,7 @@ public class Utils {
     private static final String homeFolder = System.getProperty("user.home") + s + "mangaScrapping" + s;
 
     public static Path getPathAndCreateFolders(String mangaName, String inputString) {
-        String volume = inputString.substring(inputString.indexOf("/vol"), inputString.lastIndexOf("/"));
+        String volume = inputString.substring(inputString.lastIndexOf("/vol"), inputString.lastIndexOf("/"));
         String chapter = inputString.substring(inputString.lastIndexOf("/"));
         if (chapter.contains("?")) {
             chapter = chapter.substring(0, chapter.indexOf("?"));
