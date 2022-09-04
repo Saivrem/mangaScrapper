@@ -29,7 +29,7 @@ test {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'org.example.Main',
+                'Main-Class': 'org.dustyroom.Main',
         )
     }
 }
