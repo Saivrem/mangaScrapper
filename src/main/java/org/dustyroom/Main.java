@@ -16,8 +16,10 @@ public class Main {
                                                           .build();
             scrapper.scrap();
         } else {
-            System.out.println(
-                    "You need to specify manga name and link as args[0] and args[1] respectively\nargs[2] == m is for mature manga (optional)");
+            System.out.println("""
+                    You need to specify manga name and link as args[0] and args[1] respectively
+                    args[2] == m is for mature manga (optional)
+                    """);
         }
     }
 }

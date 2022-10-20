@@ -14,7 +14,9 @@ import java.util.TreeSet;
 public class Utils {
 
     private static final String s = File.separator;
-    private static final String homeFolder = System.getProperty("user.home") + s + "mangaScrapping" + s;
+    //private static final String homeFolder = System.getProperty("user.home");
+    private static final String jarPath = Utils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+    private static final String WORKDIR = jarPath.substring(0, (jarPath.lastIndexOf("/") + 1)) + "mangaScrapping" + s;
 
     public static Path getPathAndCreateFolders(String mangaName, String inputString) {
         String volume = inputString.substring(inputString.lastIndexOf("/vol"), inputString.lastIndexOf("/"));
@@ -22,7 +24,7 @@ public class Utils {
         if (chapter.contains("?")) {
             chapter = chapter.substring(0, chapter.indexOf("?"));
         }
-        Path path = Paths.get(String.format("%s%s%s%s", homeFolder, mangaName, volume, chapter));
+        Path path = Paths.get(String.format("%s%s%s%s", WORKDIR, mangaName, volume, chapter));
         path.toFile().mkdirs();
         return path;
     }
