@@ -1,4 +1,4 @@
-package org.dustyroom.manga.scrapper;
+package org.dustyroom.general;
 
 import lombok.experimental.UtilityClass;
 

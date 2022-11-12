@@ -14,11 +14,11 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.dustyroom.manga.scrapper.LoadingTool.download;
-import static org.dustyroom.manga.scrapper.Utils.cleanHref;
-import static org.dustyroom.manga.scrapper.Utils.extractPageLinks;
-import static org.dustyroom.manga.scrapper.Utils.getFileName;
-import static org.dustyroom.manga.scrapper.Utils.getPathAndCreateFolders;
+import static org.dustyroom.general.LoadingTool.download;
+import static org.dustyroom.manga.MangaUtils.cleanHref;
+import static org.dustyroom.manga.MangaUtils.extractPageLinks;
+import static org.dustyroom.manga.MangaUtils.getFileName;
+import static org.dustyroom.manga.MangaUtils.prepareChapterFolder;
 
 @Builder
 public class MangaLiveScrapper {
@@ -29,11 +29,11 @@ public class MangaLiveScrapper {
 
     public void scrap() throws Exception {
         Set<String> chapters = getChapters();
-        String DOMAIN = mangaRoot.substring(0, mangaRoot.lastIndexOf("/"));
+        String rootUrl = mangaRoot.substring(0, mangaRoot.lastIndexOf("/"));
 
         for (String chapter : chapters) {
-            Path path = getPathAndCreateFolders(mangaName, chapter);
-            Set<String> chapterPages = getChapterPages(DOMAIN + chapter);
+            Path chapterFolder = prepareChapterFolder(mangaName, chapter);
+            Set<String> chapterPages = getChapterPages(rootUrl + chapter);
             for (String chapterPage : chapterPages) {
                 URL url = new URL(chapterPage);
                 String fileName = getFileName(url);
@@ -41,7 +41,7 @@ public class MangaLiveScrapper {
                     fileName = fileName.substring(0, fileName.indexOf("?"));
                 }
 
-                File outputFile = new File(path.toFile(), fileName);
+                File outputFile = new File(chapterFolder.toFile(), fileName);
                 download(url, outputFile, fileName);
             }
         }

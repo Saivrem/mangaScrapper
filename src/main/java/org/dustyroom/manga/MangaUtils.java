@@ -1,30 +1,32 @@
-package org.dustyroom.manga.scrapper;
+package org.dustyroom.manga;
 
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
-@UtilityClass
-public class Utils {
+import static org.dustyroom.general.Constants.jarPath;
+import static org.dustyroom.general.Constants.s;
 
-    private static final String s = File.separator;
-    //private static final String homeFolder = System.getProperty("user.home");
-    private static final String jarPath = Utils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+@UtilityClass
+public class MangaUtils {
     private static final String WORKDIR = jarPath.substring(0, (jarPath.lastIndexOf("/") + 1)) + "mangaScrapping" + s;
 
-    public static Path getPathAndCreateFolders(String mangaName, String inputString) {
-        String volume = inputString.substring(inputString.lastIndexOf("/vol"), inputString.lastIndexOf("/"));
-        String chapter = inputString.substring(inputString.lastIndexOf("/"));
+    public static Path prepareChapterFolder(String mangaName, String fullChapterName) {
+        String volume = fullChapterName.substring(fullChapterName.lastIndexOf("/vol") + 1, fullChapterName.lastIndexOf("/"));
+        String chapter = fullChapterName.substring(fullChapterName.lastIndexOf("/") + 1);
         if (chapter.contains("?")) {
             chapter = chapter.substring(0, chapter.indexOf("?"));
         }
-        Path path = Paths.get(String.format("%s%s%s%s", WORKDIR, mangaName, volume, chapter));
+
+        int chapterNumber = Integer.parseInt(chapter);
+        int volumeNumber = Integer.parseInt(volume.substring(3));
+
+        Path path = Paths.get(String.format("%s%s/vol%03d/ch%03d", WORKDIR, mangaName, volumeNumber, chapterNumber));
         path.toFile().mkdirs();
         return path;
     }
