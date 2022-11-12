@@ -17,16 +17,13 @@ public class MangaUtils {
     private static final String WORKDIR = jarPath.substring(0, (jarPath.lastIndexOf("/") + 1)) + "mangaScrapping" + s;
 
     public static Path prepareChapterFolder(String mangaName, String fullChapterName) {
-        String volume = fullChapterName.substring(fullChapterName.lastIndexOf("/vol") + 1, fullChapterName.lastIndexOf("/"));
-        String chapter = fullChapterName.substring(fullChapterName.lastIndexOf("/") + 1);
+        String volume = fullChapterName.substring(fullChapterName.lastIndexOf("/vol"), fullChapterName.lastIndexOf("/"));
+        String chapter = fullChapterName.substring(fullChapterName.lastIndexOf("/"));
         if (chapter.contains("?")) {
             chapter = chapter.substring(0, chapter.indexOf("?"));
         }
 
-        int chapterNumber = Integer.parseInt(chapter);
-        int volumeNumber = Integer.parseInt(volume.substring(3));
-
-        Path path = Paths.get(String.format("%s%s/vol%03d/ch%03d", WORKDIR, mangaName, volumeNumber, chapterNumber));
+        Path path = Paths.get(String.format("%s%s%s%s", WORKDIR, mangaName, volume, chapter));
         path.toFile().mkdirs();
         return path;
     }
