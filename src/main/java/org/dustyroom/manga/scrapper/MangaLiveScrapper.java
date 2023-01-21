@@ -22,7 +22,7 @@ import static org.dustyroom.manga.MangaUtils.prepareChapterFolder;
 import static org.dustyroom.utils.LoadingTool.download;
 
 @Builder
-public class MangaLiveScrapper implements Runnable {
+public class MangaLiveScrapper {
 
     private String mangaPageLink;
     private boolean needMature;
