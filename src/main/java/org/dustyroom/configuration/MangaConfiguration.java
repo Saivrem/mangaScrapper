@@ -25,4 +25,9 @@ public class MangaConfiguration {
      * check rm_h.servers in console on the site
      */
     private String proxy;
+
+    /**
+     * Custom path if needed, default is ($HOME/mangaScrapping)
+     */
+    private String targetDir;
 }

@@ -8,7 +8,8 @@
     "mangaName": "mangaName",
     "mangaPageLink": "http://localhost", 
     "isMature": false, 
-    "proxy": "link"
+    "proxy": "link",
+    "targetDir": "customPathIfNeeded"
   },
   {
     "mangaName": "test2",

@@ -15,27 +15,32 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.dustyroom.general.LoadingTool.download;
 import static org.dustyroom.manga.MangaUtils.cleanHref;
 import static org.dustyroom.manga.MangaUtils.extractPageLinks;
 import static org.dustyroom.manga.MangaUtils.getFileName;
 import static org.dustyroom.manga.MangaUtils.prepareChapterFolder;
+import static org.dustyroom.utils.LoadingTool.download;
 
 @Builder
-public class MangaLiveScrapper {
+public class MangaLiveScrapper implements Runnable {
 
     private String mangaPageLink;
     private boolean needMature;
     private String mangaName;
     private String proxy;
+    private String targetDir;
+    private final String s = File.separator;
 
-    public void scrap() {
+    public void run() {
+        if (targetDir == null) {
+            targetDir = System.getProperty("user.home") + s + "mangaScrapping" + s;
+        }
         try {
             Set<String> chapters = getChapters();
             String rootUrl = mangaPageLink.substring(0, mangaPageLink.lastIndexOf("/"));
 
             for (String chapter : chapters) {
-                Path chapterFolder = prepareChapterFolder(mangaName, chapter);
+                Path chapterFolder = prepareChapterFolder(targetDir, mangaName, chapter);
                 Set<String> chapterPages = getChapterPages(rootUrl + chapter);
                 for (String chapterPage : chapterPages) {
                     URL url = new URL(chapterPage);

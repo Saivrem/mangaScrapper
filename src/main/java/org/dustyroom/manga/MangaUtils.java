@@ -9,23 +9,19 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.dustyroom.general.Constants.jarPath;
-import static org.dustyroom.general.Constants.s;
+import static org.dustyroom.configuration.ForbiddenDomain.getFallbackIfNeeded;
 
 @UtilityClass
 public class MangaUtils {
 
-    //todo rework this to consume config or use $HOME
-    private static final String WORKDIR = jarPath.substring(0, (jarPath.lastIndexOf("/") + 1)) + "mangaScrapping" + s;
-
-    public static Path prepareChapterFolder(String mangaName, String fullChapterName) {
+    public static Path prepareChapterFolder(String workdir, String mangaName, String fullChapterName) {
         String volume = fullChapterName.substring(fullChapterName.lastIndexOf("/vol"), fullChapterName.lastIndexOf("/"));
         String chapter = fullChapterName.substring(fullChapterName.lastIndexOf("/"));
         if (chapter.contains("?")) {
             chapter = chapter.substring(0, chapter.indexOf("?"));
         }
 
-        Path path = Paths.get(String.format("%s%s%s%s", WORKDIR, mangaName, volume, chapter));
+        Path path = Paths.get(String.format("%s%s%s%s", workdir, mangaName, volume, chapter));
         path.toFile().mkdirs();
         return path;
     }
@@ -51,7 +47,7 @@ public class MangaUtils {
         for (String str : arrayOfElementArraysString.split("],\\[")) {
             String cleanedString = str.replaceAll("[\\[\"']", "");
             String[] elementArray = cleanedString.split(",");
-            String domain = proxy == null ? elementArray[0] : proxy;
+            String domain = (proxy != null) ? proxy : getFallbackIfNeeded(elementArray[0]);
             String path = elementArray[2];
             if (StringUtils.isNoneBlank(domain, path)) {
                 result.add(domain + path);

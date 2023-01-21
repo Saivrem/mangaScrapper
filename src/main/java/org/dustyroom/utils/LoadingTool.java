@@ -1,4 +1,4 @@
-package org.dustyroom.general;
+package org.dustyroom.utils;
 
 import lombok.experimental.UtilityClass;
 
@@ -12,8 +12,11 @@ import java.net.URL;
 @UtilityClass
 public class LoadingTool {
 
-    public static void download(URL url, File outputFile, String fileName) {
+    static {
         System.setProperty("http.agent", "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0");
+    }
+
+    public static void download(URL url, File outputFile, String fileName) {
         try (InputStream in = url.openStream();
              OutputStream out = new FileOutputStream(outputFile)) {
 
