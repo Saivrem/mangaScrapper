@@ -8,6 +8,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -23,31 +24,36 @@ import static org.dustyroom.manga.MangaUtils.prepareChapterFolder;
 @Builder
 public class MangaLiveScrapper {
 
-    private String mangaRoot;
+    private String mangaPageLink;
     private boolean needMature;
     private String mangaName;
+    private String proxy;
 
-    public void scrap() throws Exception {
-        Set<String> chapters = getChapters();
-        String rootUrl = mangaRoot.substring(0, mangaRoot.lastIndexOf("/"));
+    public void scrap() {
+        try {
+            Set<String> chapters = getChapters();
+            String rootUrl = mangaPageLink.substring(0, mangaPageLink.lastIndexOf("/"));
 
-        for (String chapter : chapters) {
-            Path chapterFolder = prepareChapterFolder(mangaName, chapter);
-            Set<String> chapterPages = getChapterPages(rootUrl + chapter);
-            for (String chapterPage : chapterPages) {
-                URL url = new URL(chapterPage);
-                String fileName = getFileName(url);
-                if (fileName.contains("?")) {
-                    fileName = fileName.substring(0, fileName.indexOf("?"));
+            for (String chapter : chapters) {
+                Path chapterFolder = prepareChapterFolder(mangaName, chapter);
+                Set<String> chapterPages = getChapterPages(rootUrl + chapter);
+                for (String chapterPage : chapterPages) {
+                    URL url = new URL(chapterPage);
+                    String fileName = getFileName(url);
+                    if (fileName.contains("?")) {
+                        fileName = fileName.substring(0, fileName.indexOf("?"));
+                    }
+
+                    File outputFile = new File(chapterFolder.toFile(), fileName);
+                    download(url, outputFile, fileName);
                 }
-
-                File outputFile = new File(chapterFolder.toFile(), fileName);
-                download(url, outputFile, fileName);
             }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    private Set<String> getChapterPages(String chapter) throws Exception {
+    private Set<String> getChapterPages(String chapter) throws IOException {
         Document document = Jsoup.connect(chapter).get();
         Elements scripts = document.select("script");
         for (Element script : scripts) {
@@ -56,14 +62,14 @@ public class MangaLiveScrapper {
             if (script.attr("type").equals("text/javascript")
                     && StringUtils.isNotBlank(data)
                     && data.contains(CHAPTERS_INIT)) {
-                return extractPageLinks(data.substring(data.indexOf(CHAPTERS_INIT)));
+                return extractPageLinks(data.substring(data.indexOf(CHAPTERS_INIT)), proxy);
             }
         }
         return Collections.emptySet();
     }
 
-    private Set<String> getChapters() throws Exception {
-        Document document = Jsoup.connect(mangaRoot).get();
+    private Set<String> getChapters() throws IOException {
+        Document document = Jsoup.connect(mangaPageLink).get();
         Elements allLinks = document.select("a[href]");
         Set<String> chapters = new TreeSet<>();
         for (Element link : allLinks) {

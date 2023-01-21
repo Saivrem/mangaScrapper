@@ -1,25 +1,33 @@
 package org.dustyroom;
 
+import org.dustyroom.configuration.MangaConfiguration;
 import org.dustyroom.manga.scrapper.MangaLiveScrapper;
+import org.dustyroom.utils.ObjectMapperUtils;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Objects;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        if (args.length >= 2) {
-            String mangaName = args[0];
-            String mangaLink = args[1];
-            boolean mature = args.length == 3 && args[2].equals("m");
-            MangaLiveScrapper scrapper = MangaLiveScrapper.builder()
-                                                          .mangaName(mangaName)
-                                                          .mangaRoot(mangaLink)
-                                                          .needMature(mature)
-                                                          .build();
-            scrapper.scrap();
-        } else {
-            System.out.println("""
-                    You need to specify manga name and link as args[0] and args[1] respectively
-                    args[2] == m is for mature manga (optional)
-                    """);
+        if (args.length > 0) {
+            InputStream inputStream = new FileInputStream(args[0]);
+            List<MangaConfiguration> mangaConfigurations = ObjectMapperUtils.readMangaConfiguration(inputStream);
+            if (mangaConfigurations != null) {
+                mangaConfigurations.stream()
+                                   .filter(Objects::nonNull)
+                                   .map(config -> MangaLiveScrapper.builder()
+                                                                   .mangaName(config.getMangaName())
+                                                                   .mangaPageLink(config.getMangaPageLink())
+                                                                   .needMature(config.isMature())
+                                                                   .proxy(config.getProxy())
+                                                                   .build())
+                                   .forEach(MangaLiveScrapper::scrap);
+            } else {
+                System.out.printf("Wrong configuration file received %s\n", args[0]);
+            }
         }
     }
 }

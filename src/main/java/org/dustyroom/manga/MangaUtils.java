@@ -14,6 +14,8 @@ import static org.dustyroom.general.Constants.s;
 
 @UtilityClass
 public class MangaUtils {
+
+    //todo rework this to consume config or use $HOME
     private static final String WORKDIR = jarPath.substring(0, (jarPath.lastIndexOf("/") + 1)) + "mangaScrapping" + s;
 
     public static Path prepareChapterFolder(String mangaName, String fullChapterName) {
@@ -43,13 +45,13 @@ public class MangaUtils {
         return href;
     }
 
-    public static Set<String> extractPageLinks(String input) {
+    public static Set<String> extractPageLinks(String input, String proxy) {
         Set<String> result = new TreeSet<>();
         String arrayOfElementArraysString = input.substring(input.indexOf("[["), input.lastIndexOf("]]"));
         for (String str : arrayOfElementArraysString.split("],\\[")) {
             String cleanedString = str.replaceAll("[\\[\"']", "");
             String[] elementArray = cleanedString.split(",");
-            String domain = elementArray[0];
+            String domain = proxy == null ? elementArray[0] : proxy;
             String path = elementArray[2];
             if (StringUtils.isNoneBlank(domain, path)) {
                 result.add(domain + path);
