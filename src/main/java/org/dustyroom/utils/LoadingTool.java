@@ -28,15 +28,14 @@ public class LoadingTool {
             }
             out.flush();
             System.out.println("Finished: " + fileName);
-        } catch (
-                IOException ioEx) {
+        } catch (IOException ioEx) {
             if (ioEx.getMessage().contains("HTTP response code: 401")) {
                 System.out.println("Login or password are invalid; ");
             } else if (ioEx.getMessage().contains("HTTP response code: 403")) {
                 System.out.println("You are not authorized to get this file;");
             } else if (ioEx.getMessage().contains("HTTP response code: 404") || ioEx.getClass()
-                                                                                    .getSimpleName()
-                                                                                    .equals("FileNotFoundException")) {
+                    .getSimpleName()
+                    .equals("FileNotFoundException")) {
                 System.out.println("File not found; ");
             } else {
                 System.out.println("Error was caught; ");

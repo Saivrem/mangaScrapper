@@ -1,7 +1,6 @@
 package org.dustyroom.manga.scrapper;
 
 import lombok.Builder;
-import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,10 +10,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dustyroom.manga.MangaUtils.cleanHref;
 import static org.dustyroom.manga.MangaUtils.extractPageLinks;
 import static org.dustyroom.manga.MangaUtils.getFileName;
@@ -23,13 +21,13 @@ import static org.dustyroom.utils.LoadingTool.download;
 
 @Builder
 public class MangaLiveScrapper {
-
+    private final List<String> initializers = List.of("rm_h.readerInit( ", "rm_h.initReader( ");
+    private final String s = File.separator;
     private String mangaPageLink;
     private boolean needMature;
     private String mangaName;
     private String proxy;
     private String targetDir;
-    private final String s = File.separator;
 
     public void run() {
         if (targetDir == null) {
@@ -63,14 +61,18 @@ public class MangaLiveScrapper {
         Elements scripts = document.select("script");
         for (Element script : scripts) {
             String data = script.data();
-            String CHAPTERS_INIT = "rm_h.initReader( ";
-            if (script.attr("type").equals("text/javascript")
-                    && StringUtils.isNotBlank(data)
-                    && data.contains(CHAPTERS_INIT)) {
-                return extractPageLinks(data.substring(data.indexOf(CHAPTERS_INIT)), proxy);
+            if (script.attr("type").equals("text/javascript") && isNotBlank(data)) {
+                String initializer = getInitializer(data);
+                if (isNotBlank(initializer)) {
+                    return extractPageLinks(data.substring(data.indexOf(initializer)), proxy);
+                }
             }
         }
         return Collections.emptySet();
+    }
+
+    private String getInitializer(String data) {
+        return initializers.stream().filter(data::contains).findFirst().orElse(null);
     }
 
     private Set<String> getChapters() throws IOException {
