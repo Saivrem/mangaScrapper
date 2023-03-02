@@ -18,7 +18,7 @@ public class MangaConfiguration {
     /**
      * is Mature flag needed
      */
-    private boolean isMature;
+    private boolean mature;
     /**
      * sometimes original picture domain is protected,
      * you can setup proxy domain
