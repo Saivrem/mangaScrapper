@@ -7,14 +7,14 @@
   {
     "mangaName": "mangaName",
     "mangaPageLink": "http://localhost", 
-    "isMature": false, 
+    "mature": false, 
     "proxy": "link",
     "targetDir": "customPathIfNeeded"
   },
   {
     "mangaName": "test2",
     "mangaPageLink": "http://localhost",
-    "isMature": true
+    "mature": true
   }
 ]
 ```
