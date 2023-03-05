@@ -1,4 +1,4 @@
-package org.dustyroom.general;
+package org.dustyroom.utils;
 
 import lombok.experimental.UtilityClass;
 
@@ -12,8 +12,11 @@ import java.net.URL;
 @UtilityClass
 public class LoadingTool {
 
-    public static void download(URL url, File outputFile, String fileName) {
+    static {
         System.setProperty("http.agent", "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0");
+    }
+
+    public static void download(URL url, File outputFile, String fileName) {
         try (InputStream in = url.openStream();
              OutputStream out = new FileOutputStream(outputFile)) {
 
@@ -25,15 +28,14 @@ public class LoadingTool {
             }
             out.flush();
             System.out.println("Finished: " + fileName);
-        } catch (
-                IOException ioEx) {
+        } catch (IOException ioEx) {
             if (ioEx.getMessage().contains("HTTP response code: 401")) {
                 System.out.println("Login or password are invalid; ");
             } else if (ioEx.getMessage().contains("HTTP response code: 403")) {
                 System.out.println("You are not authorized to get this file;");
             } else if (ioEx.getMessage().contains("HTTP response code: 404") || ioEx.getClass()
-                                                                                    .getSimpleName()
-                                                                                    .equals("FileNotFoundException")) {
+                    .getSimpleName()
+                    .equals("FileNotFoundException")) {
                 System.out.println("File not found; ");
             } else {
                 System.out.println("Error was caught; ");
