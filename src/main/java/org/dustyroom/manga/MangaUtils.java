@@ -1,7 +1,6 @@
 package org.dustyroom.manga;
 
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -14,9 +13,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.dustyroom.configuration.ForbiddenDomain.getFallbackIfNeeded;
+import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
 
 @UtilityClass
-@Slf4j
 public class MangaUtils {
 
     /**
@@ -38,7 +37,7 @@ public class MangaUtils {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            log.warn("Couldn't create folder {}", path);
+            decodeException(e, "Couldn't create folder; {}");
             return null;
         }
         return path;
@@ -53,8 +52,8 @@ public class MangaUtils {
                 fileName = fileName.substring(0, fileName.indexOf("?"));
             }
             return fileName;
-        } catch (MalformedURLException malformedURLException) {
-            log.warn("Malformed Url was provided: {}", chapterPage);
+        } catch (MalformedURLException e) {
+            decodeException(e, "Malformed Url was provided: {}");
             return null;
         }
     }

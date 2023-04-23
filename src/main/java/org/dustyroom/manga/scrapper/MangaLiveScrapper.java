@@ -1,7 +1,6 @@
 package org.dustyroom.manga.scrapper;
 
 import lombok.Builder;
-import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,10 +16,10 @@ import java.util.TreeSet;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dustyroom.manga.MangaUtils.*;
+import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
 import static org.dustyroom.utils.LoadingTool.download;
 
 @Builder
-@Slf4j
 public class MangaLiveScrapper {
     private final List<String> initializers = List.of("rm_h.readerInit( ", "rm_h.initReader( ");
     private final String s = File.separator;
@@ -37,12 +36,15 @@ public class MangaLiveScrapper {
 
         for (String chapterLink : getChapters()) {
             Path chapterFolder = prepareChapterFolder(targetDir, mangaName, chapterLink);
-            if (chapterFolder == null) continue;
+            if (chapterFolder == null) {
+                continue;
+            }
             for (String chapterPage : getChapterPages(chapterLink)) {
                 String fileName = getFileName(chapterPage);
-                if (fileName == null) continue;
-                Path pageFilePath = chapterFolder.resolve(fileName);
-                download(chapterLink, pageFilePath, fileName);
+                if (fileName == null) {
+                    continue;
+                }
+                download(chapterLink, chapterFolder.resolve(fileName));
             }
         }
     }
@@ -60,8 +62,8 @@ public class MangaLiveScrapper {
                     }
                 }
             }
-        } catch (IOException ioException) {
-            log.warn(ioException.getMessage());
+        } catch (IOException e) {
+            decodeException(e, "Can't get chapter pages; {}");
         }
         return Collections.emptySet();
     }
@@ -87,7 +89,7 @@ public class MangaLiveScrapper {
             }
             return chapters;
         } catch (IOException e) {
-            log.warn(e.getMessage());
+            decodeException(e, "Can't get chapters; {}");
             return Collections.emptySet();
         }
     }

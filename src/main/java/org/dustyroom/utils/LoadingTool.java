@@ -10,6 +10,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
+
 @UtilityClass
 @Slf4j
 public class LoadingTool {
@@ -18,7 +20,7 @@ public class LoadingTool {
         System.setProperty("http.agent", "Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/81.0");
     }
 
-    public static void download(String link, Path outputPath, String fileName) {
+    public static void download(String link, Path outputPath) {
         if (Files.exists(outputPath)) {
             return;
         }
@@ -30,19 +32,9 @@ public class LoadingTool {
                 out.write(buffer, 0, length);
             }
             out.flush();
-            log.info("Finished: " + fileName);
-        } catch (IOException ioEx) {
-            if (ioEx.getMessage().contains("HTTP response code: 401")) {
-                log.warn("Login or password are invalid;");
-            } else if (ioEx.getMessage().contains("HTTP response code: 403")) {
-                log.warn("You are not authorized to get this file;");
-            } else if (ioEx.getMessage().contains("HTTP response code: 404") || ioEx.getClass()
-                    .getSimpleName()
-                    .equals("FileNotFoundException")) {
-                log.warn("File not found;");
-            } else {
-                log.warn("Error was caught;");
-            }
+            log.info("Finished: " + outputPath.getFileName());
+        } catch (IOException e) {
+            decodeException(e, "");
         }
     }
 }
