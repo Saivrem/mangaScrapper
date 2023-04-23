@@ -44,7 +44,7 @@ public class MangaLiveScrapper {
                 if (fileName == null) {
                     continue;
                 }
-                download(chapterLink, chapterFolder.resolve(fileName));
+                download(chapterPage, chapterFolder.resolve(fileName));
             }
         }
     }
