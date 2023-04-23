@@ -32,7 +32,7 @@ public class LoadingTool {
                 out.write(buffer, 0, length);
             }
             out.flush();
-            log.info("Finished: " + outputPath.getFileName());
+            log.info("Finished: {}/{}/{}", outputPath.getParent().getParent().getFileName(), outputPath.getParent().getFileName(), outputPath.getFileName());
         } catch (IOException e) {
             decodeException(e, "");
         }
