@@ -3,17 +3,29 @@ package org.dustyroom.manga;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
 import static org.dustyroom.configuration.ForbiddenDomain.getFallbackIfNeeded;
+import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
 
 @UtilityClass
 public class MangaUtils {
 
+    /**
+     * Creates a folder to store chapter files, if folder already exists returns null which should mean - no need to process.
+     *
+     * @param workdir         I should rename this one, probably it's a target directory for all scrapping
+     * @param mangaName       the name of manga to load (root dir for it should have same name)
+     * @param fullChapterName probably it's what stands for tom number
+     * @return chapter path or null if it already exists, hence, shan't be processed.
+     */
     public static Path prepareChapterFolder(String workdir, String mangaName, String fullChapterName) {
         String volume = fullChapterName.substring(fullChapterName.lastIndexOf("/vol"), fullChapterName.lastIndexOf("/"));
         String chapter = fullChapterName.substring(fullChapterName.lastIndexOf("/"));
@@ -22,13 +34,28 @@ public class MangaUtils {
         }
 
         Path path = Paths.get(String.format("%s%s%s%s", workdir, mangaName, volume, chapter));
-        path.toFile().mkdirs();
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            decodeException(e, "Couldn't create folder; {}");
+            return null;
+        }
         return path;
     }
 
-    public static String getFileName(URL url) {
-        String tmp = url.getFile();
-        return tmp.substring(tmp.lastIndexOf("/") + 1);
+    public static String getFileName(String chapterPage) {
+        try {
+            URL url = new URL(chapterPage);
+            String fileName = url.getFile();
+            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+            if (fileName.contains("?")) {
+                fileName = fileName.substring(0, fileName.indexOf("?"));
+            }
+            return fileName;
+        } catch (MalformedURLException e) {
+            decodeException(e, "Malformed Url was provided: {}");
+            return null;
+        }
     }
 
     public static String cleanHref(String href) {
