@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
+import static org.dustyroom.utils.LoggingUtils.getFileLoggingString;
 
 @UtilityClass
 @Slf4j
@@ -21,12 +22,9 @@ public class LoadingTool {
 
     public static void download(String link, Path outputPath) {
         await(100);
-        String logPattern = String.format("%s - %s - %s",
-                outputPath.getParent().getParent().getFileName(),
-                outputPath.getParent().getFileName(),
-                outputPath.getFileName());
+
         if (Files.exists(outputPath)) {
-            log.info(logPattern);
+            log.info("File exists: {}", getFileLoggingString(outputPath));
             return;
         }
         try (InputStream in = new URL(link).openStream();
@@ -37,7 +35,7 @@ public class LoadingTool {
                 out.write(buffer, 0, length);
             }
             out.flush();
-            log.info(logPattern);
+            log.info("Downloaded: {}", getFileLoggingString(outputPath));
         } catch (Exception e) {
             decodeException(e, "");
         }

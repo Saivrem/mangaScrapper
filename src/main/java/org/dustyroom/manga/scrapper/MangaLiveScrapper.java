@@ -20,8 +20,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dustyroom.manga.MangaUtils.*;
 import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
 import static org.dustyroom.utils.LoadingTool.download;
-import static org.dustyroom.utils.MeasurementUtils.getCurrentTime;
-import static org.dustyroom.utils.MeasurementUtils.timePassed;
+import static org.dustyroom.utils.LoggingUtils.getCurrentTime;
+import static org.dustyroom.utils.LoggingUtils.timePassed;
 
 @Builder
 @Slf4j
