@@ -4,8 +4,6 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,18 +42,11 @@ public class MangaUtils {
     }
 
     public static String getFileName(String chapterPage) {
-        try {
-            URL url = new URL(chapterPage);
-            String fileName = url.getFile();
-            fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
-            if (fileName.contains("?")) {
-                fileName = fileName.substring(0, fileName.indexOf("?"));
-            }
-            return fileName;
-        } catch (MalformedURLException e) {
-            decodeException(e, "Malformed Url was provided: {}");
-            return null;
+        String fileName = chapterPage.substring(chapterPage.lastIndexOf("/") + 1);
+        if (fileName.contains("?")) {
+            fileName = fileName.substring(0, fileName.indexOf("?"));
         }
+        return fileName;
     }
 
     public static String cleanHref(String href) {

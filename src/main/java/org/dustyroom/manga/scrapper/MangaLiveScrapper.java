@@ -41,9 +41,6 @@ public class MangaLiveScrapper {
             }
             for (String chapterPage : getChapterPages(chapterLink)) {
                 String fileName = getFileName(chapterPage);
-                if (fileName == null) {
-                    continue;
-                }
                 download(chapterPage, chapterFolder.resolve(fileName));
             }
         }

@@ -3,7 +3,6 @@ package org.dustyroom.utils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -21,7 +20,13 @@ public class LoadingTool {
     }
 
     public static void download(String link, Path outputPath) {
+        await(100);
+        String logPattern = String.format("%s - %s - %s",
+                outputPath.getParent().getParent().getFileName(),
+                outputPath.getParent().getFileName(),
+                outputPath.getFileName());
         if (Files.exists(outputPath)) {
+            log.info(logPattern);
             return;
         }
         try (InputStream in = new URL(link).openStream();
@@ -32,9 +37,17 @@ public class LoadingTool {
                 out.write(buffer, 0, length);
             }
             out.flush();
-            log.info("Finished: {}/{}/{}", outputPath.getParent().getParent().getFileName(), outputPath.getParent().getFileName(), outputPath.getFileName());
-        } catch (IOException e) {
+            log.info(logPattern);
+        } catch (Exception e) {
             decodeException(e, "");
+        }
+    }
+
+    public static void await(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }
