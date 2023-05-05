@@ -1,6 +1,7 @@
 package org.dustyroom.manga.scrapper;
 
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -9,6 +10,7 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -18,8 +20,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dustyroom.manga.MangaUtils.*;
 import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
 import static org.dustyroom.utils.LoadingTool.download;
+import static org.dustyroom.utils.MeasurementUtils.getCurrentTime;
+import static org.dustyroom.utils.MeasurementUtils.timePassed;
 
 @Builder
+@Slf4j
 public class MangaLiveScrapper {
     private final List<String> initializers = List.of("rm_h.readerInit( ", "rm_h.initReader( ");
     private final String s = File.separator;
@@ -30,9 +35,11 @@ public class MangaLiveScrapper {
     private String targetDir;
 
     public void run() {
+        LocalDateTime start = getCurrentTime();
         if (targetDir == null) {
             targetDir = System.getProperty("user.home") + s + "mangaScrapping" + s;
         }
+        log.info("{} Star loading {} to {}", start, mangaName, targetDir);
 
         for (String chapterLink : getChapters()) {
             Path chapterFolder = prepareChapterFolder(targetDir, mangaName, chapterLink);
@@ -44,6 +51,13 @@ public class MangaLiveScrapper {
                 download(chapterPage, chapterFolder.resolve(fileName));
             }
         }
+        LocalDateTime end = getCurrentTime();
+        log.info("{} End loading {} to {}, time {}",
+                end,
+                mangaName,
+                targetDir,
+                timePassed(start, end)
+        );
     }
 
     private Set<String> getChapterPages(String chapter) {
