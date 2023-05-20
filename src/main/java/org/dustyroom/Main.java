@@ -1,34 +1,47 @@
 package org.dustyroom;
 
-import org.dustyroom.configuration.MangaConfiguration;
-import org.dustyroom.manga.scrapper.MangaLiveScrapper;
-import org.dustyroom.utils.ObjectMapperUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.dustyroom.scrapping.Scrapper;
+import org.dustyroom.model.MangaProperties;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
 
 public class Main {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (args.length > 0) {
-            InputStream inputStream = new FileInputStream(args[0]);
-            List<MangaConfiguration> mangaConfigurations = ObjectMapperUtils.readMangaConfiguration(inputStream);
-            if (mangaConfigurations != null) {
-                mangaConfigurations.stream()
-                                   .filter(Objects::nonNull)
-                                   .map(config -> MangaLiveScrapper.builder()
-                                                                   .mangaName(config.getMangaName())
-                                                                   .mangaPageLink(config.getMangaPageLink())
-                                                                   .needMature(config.isMature())
-                                                                   .proxy(config.getProxy())
-                                                                   .targetDir(config.getTargetDir())
-                                                                   .build())
-                                   .forEach(MangaLiveScrapper::run);
+            List<MangaProperties> mangaProperties = readMangaConfiguration(args[0]);
+            if (mangaProperties != null) {
+                mangaProperties.stream()
+                        .filter(Objects::nonNull)
+                        .map(config -> Scrapper.builder()
+                                .mangaName(config.getMangaName())
+                                .mangaPageLink(config.getMangaPageLink())
+                                .needMature(config.isMature())
+                                .proxy(config.getProxy())
+                                .targetDir(config.getTargetDir())
+                                .build())
+                        .forEach(Scrapper::run);
             } else {
                 System.out.printf("Wrong configuration file received %s\n", args[0]);
             }
+        }
+    }
+
+    private static List<MangaProperties> readMangaConfiguration(String configFile) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try (InputStream inputStream = new FileInputStream(configFile)) {
+            TypeReference<List<MangaProperties>> typeReference = new TypeReference<>() {
+            };
+            return objectMapper.readValue(inputStream, typeReference);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
