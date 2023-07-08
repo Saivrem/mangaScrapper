@@ -1,11 +1,11 @@
-package org.dustyroom.configuration;
+package org.dustyroom.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MangaConfiguration {
+public class MangaProperties {
 
     /**
      * the name of folder where content will be stored
@@ -21,7 +21,7 @@ public class MangaConfiguration {
     private boolean mature;
     /**
      * sometimes original picture domain is protected,
-     * you can setup proxy domain
+     * you can set up proxy domain
      * check rm_h.servers in console on the site
      */
     private String proxy;

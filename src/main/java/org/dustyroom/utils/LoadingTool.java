@@ -9,11 +9,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.dustyroom.utils.ExceptionLoggingUtils.decodeException;
+import static org.dustyroom.utils.LoggingUtils.decodeAndLogException;
 import static org.dustyroom.utils.LoggingUtils.getFileLoggingString;
 
-@UtilityClass
 @Slf4j
+@UtilityClass
 public class LoadingTool {
 
     static {
@@ -37,7 +37,7 @@ public class LoadingTool {
             out.flush();
             log.info("Downloaded: {}", getFileLoggingString(outputPath));
         } catch (Exception e) {
-            decodeException(e, "");
+            decodeAndLogException(e, "");
         }
     }
 

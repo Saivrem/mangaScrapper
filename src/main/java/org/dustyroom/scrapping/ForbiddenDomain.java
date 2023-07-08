@@ -1,12 +1,12 @@
-package org.dustyroom.configuration;
+package org.dustyroom.scrapping;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum ForbiddenDomain {
 
     ONEWAY("one-way.work", "https://h1.rmr.rocks/");
