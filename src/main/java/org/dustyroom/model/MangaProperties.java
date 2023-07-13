@@ -16,18 +16,9 @@ public class MangaProperties {
      */
     private String mangaPageLink;
     /**
-     * is Mature flag needed
-     */
-    private boolean mature;
-    /**
      * sometimes original picture domain is protected,
      * you can set up proxy domain
      * check rm_h.servers in console on the site
      */
-    private String proxy;
-
-    /**
-     * Custom path if needed, default is ($HOME/mangaScrapping)
-     */
-    private String targetDir;
+    private String fallbackDomain;
 }

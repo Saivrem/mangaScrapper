@@ -3,18 +3,15 @@
 ## Config file structure
 
 ```json
-[
-  {
-    "mangaName": "mangaName",
-    "mangaPageLink": "http://localhost", 
-    "mature": false, 
-    "proxy": "link",
-    "targetDir": "customPathIfNeeded"
-  },
-  {
-    "mangaName": "test2",
-    "mangaPageLink": "http://localhost",
-    "mature": true
-  }
-]
+{
+  "targetDir":"/path/to/dir/",
+  "mature": true,
+  "mangaList": [
+    {
+      "mangaName": "mangaName",
+      "mangaPageLink": "mangaLink",
+      "fallbackDomain": "fallbackDomain"
+    }
+  ]
+}
 ```
