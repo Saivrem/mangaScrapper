@@ -1,5 +1,6 @@
 package org.dustyroom.utils;
 
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
@@ -52,5 +53,10 @@ public class LoggingUtils {
             log.warn(customMessagePattern, e.getMessage());
         }
         log.warn(e.getMessage());
+    }
+
+    @SneakyThrows
+    public static void await(int ms) {
+        Thread.sleep(ms);
     }
 }

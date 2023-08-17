@@ -2,6 +2,7 @@ package org.dustyroom;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.dustyroom.model.DownloadConfig;
 import org.dustyroom.scrapping.Scrapper;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 
+@Slf4j
 public class Main {
 
     public static void main(String[] args) {
@@ -19,16 +21,16 @@ public class Main {
                 downloadConfig.getMangaList().stream()
                         .filter(Objects::nonNull)
                         .map(mangaProperties -> Scrapper.builder()
-                                .mangaName(mangaProperties.getMangaName())
-                                .mangaPageLink(mangaProperties.getMangaPageLink())
-                                .needMature(downloadConfig.isMature())
-                                .proxy(mangaProperties.getFallbackDomain())
-                                .targetDir(downloadConfig.getTargetDir())
-                                .build())
+                                                        .mangaName(mangaProperties.getMangaName())
+                                                        .mangaPageLink(mangaProperties.getMangaPageLink())
+                                                        .needMature(downloadConfig.isMature())
+                                                        .proxy(mangaProperties.getFallbackDomain())
+                                                        .targetDir(downloadConfig.getTargetDir())
+                                                        .build())
                         .forEach(Scrapper::run);
-            } else {
-                System.out.printf("Wrong configuration file received %s\n", args[0]);
             }
+        } else {
+            log.warn("No config provided");
         }
     }
 
@@ -39,7 +41,7 @@ public class Main {
             };
             return objectMapper.readValue(inputStream, typeReference);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.warn("Config could not be loaded {}", e.getMessage());
             return null;
         }
     }

@@ -4,13 +4,12 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
-import static org.dustyroom.utils.LoggingUtils.decodeAndLogException;
-import static org.dustyroom.utils.LoggingUtils.getFileLoggingString;
+import static org.dustyroom.utils.LoggingUtils.*;
 
 @Slf4j
 @UtilityClass
@@ -27,25 +26,11 @@ public class LoadingTool {
             log.info("File exists: {}", getFileLoggingString(outputPath));
             return;
         }
-        try (InputStream in = new URL(link).openStream();
-             OutputStream out = Files.newOutputStream(outputPath)) {
-            int length;
-            byte[] buffer = new byte[1024];
-            while ((length = in.read(buffer)) != -1) {
-                out.write(buffer, 0, length);
-            }
-            out.flush();
+        try (InputStream in = new URL(link).openStream()) {
+            Files.copy(in, outputPath, StandardCopyOption.REPLACE_EXISTING);
             log.info("Downloaded: {}", getFileLoggingString(outputPath));
         } catch (Exception e) {
             decodeAndLogException(e, "");
-        }
-    }
-
-    public static void await(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 }
