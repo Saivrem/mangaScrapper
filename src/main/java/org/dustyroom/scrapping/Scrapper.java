@@ -199,7 +199,7 @@ public class Scrapper {
             if (!Character.isLetter(current) && current != '.') break;
             extensionBuilder.append(rawNameChars[i]);
         }
-        return fileNameBuilder.reverse() + extensionBuilder.toString();
+        return fileNameBuilder.isEmpty() ? rawName : fileNameBuilder.reverse() + extensionBuilder.toString();
     }
 
     private String cleanHref(String href) {
