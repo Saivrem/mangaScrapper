@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.dustyroom.scrapping.ForbiddenDomain.getFallbackIfNeeded;
@@ -51,7 +54,11 @@ public class Scrapper {
                 String fileName = getFileName(chapterPage);
                 download(chapterPage, chapterFolder.resolve(fileName));
             }
+            zipChapter(chapterFolder);
         }
+
+        cleanVolumeDirectories();
+
         LocalDateTime end = getCurrentTime();
         log.info("{} End loading {} to {}, time {}",
                 end,
@@ -59,6 +66,46 @@ public class Scrapper {
                 targetDir,
                 timePassed(start, end)
         );
+    }
+
+    private void cleanVolumeDirectories() {
+        try {
+            Path clean = Path.of(targetDir + mangaName);
+            Files.walk(clean).filter(Files::isDirectory).forEach(file -> {
+                try {
+                    Files.delete(file);
+                } catch (IOException ignore) {
+                }
+            });
+        } catch (IOException e) {
+            log.warn("Can't remove volume dir {}", e.getMessage());
+        }
+    }
+
+    private static void zipChapter(Path chapterFolder) {
+        Path zipFilePath = Path.of(chapterFolder.getParent().toString() + "-ch" + chapterFolder.getFileName().toString() + ".zip");
+        try (FileOutputStream fos = new FileOutputStream(zipFilePath.toFile());
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
+            Files.walk(chapterFolder)
+                    .filter(Files::isRegularFile)
+                    .forEach(file -> {
+                        try {
+                            Path relativePath = chapterFolder.relativize(file);
+                            zos.putNextEntry(new ZipEntry(relativePath.toString()));
+                            byte[] bytes = Files.readAllBytes(file);
+                            zos.write(bytes, 0, bytes.length);
+                            zos.closeEntry();
+                            Files.delete(file);
+                        } catch (IOException e) {
+                            log.warn("Error during archiving {}", file);
+                        }
+                    });
+            fos.flush();
+            Files.delete(chapterFolder);
+        } catch (IOException e) {
+            log.warn("Error during archiving {}", chapterFolder);
+        }
+        log.info("Chapter is zipped to {}", zipFilePath);
     }
 
     private Set<String> getChapterPages(String chapter) {
@@ -132,11 +179,27 @@ public class Scrapper {
     }
 
     private String getFileName(String chapterPage) {
-        String fileName = chapterPage.substring(chapterPage.lastIndexOf("/") + 1);
-        if (fileName.contains("?")) {
-            fileName = fileName.substring(0, fileName.indexOf("?"));
+        String rawName = chapterPage.substring(chapterPage.lastIndexOf("/") + 1);
+        if (rawName.contains("?")) {
+            rawName = rawName.substring(0, rawName.indexOf("?"));
         }
-        return fileName;
+
+        StringBuilder fileNameBuilder = new StringBuilder();
+        StringBuilder extensionBuilder = new StringBuilder();
+
+        int extensionIndex = rawName.lastIndexOf(".");
+        char[] rawNameChars = rawName.toCharArray();
+        for (int i = extensionIndex - 1; i >= 0; i--) {
+            char current = rawNameChars[i];
+            if (!Character.isDigit(current)) continue;
+            fileNameBuilder.append(rawNameChars[i]);
+        }
+        for (int i = extensionIndex; i < rawNameChars.length; i++) {
+            char current = rawNameChars[i];
+            if (!Character.isLetter(current) && current != '.') break;
+            extensionBuilder.append(rawNameChars[i]);
+        }
+        return fileNameBuilder.reverse() + extensionBuilder.toString();
     }
 
     private String cleanHref(String href) {
