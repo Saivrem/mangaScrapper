@@ -22,4 +22,5 @@ public class MangaProperties {
      */
     private String fallbackDomain;
     private Boolean compressionNeeded = false;
+    private boolean needed;
 }

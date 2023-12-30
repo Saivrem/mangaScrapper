@@ -10,6 +10,10 @@ import java.util.List;
 public class DownloadConfig {
 
     /**
+     * Simple identifier for which version of scrapper config is, not really used within software
+     */
+    String scrapperVersion;
+    /**
      * Custom path if needed, default is ($HOME/mangaScrapping)
      */
     private String targetDir;
@@ -25,6 +29,7 @@ public class DownloadConfig {
     private List<String> blacklist;
     /**
      * List of manga properties. One config could have more than one manga to load
+     *
      * @see MangaProperties
      */
     private List<MangaProperties> mangaList;

@@ -16,9 +16,11 @@
       "mangaName": "mangaName",
       "mangaPageLink": "mangaLink",
       "fallbackDomain": "fallbackDomain",
-      "compressionNeeded": false
+      "compressionNeeded": false,
+      "needed": true
     }
   ]
 }
 ```
-**compressionNeeded** is a flag to indicate that chapters should be zipped, if set to true, everything except for zip archives will be removed once download is finished. 
+**compressionNeeded** is a flag to indicate that chapters should be zipped, if set to true, everything except for zip archives will be removed once download is finished.
+**needed** flag that manga should be loaded (so you can keep long config and only load several titles)
