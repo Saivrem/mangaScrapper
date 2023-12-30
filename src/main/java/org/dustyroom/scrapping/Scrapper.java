@@ -54,6 +54,7 @@ public class Scrapper {
             if (manga.isZip()) {
                 zipChapter(chapterFolder);
             }
+            log.info("Chapter {} loaded", chapterFolder.getFileName());
         }
         if (manga.isZip()) {
             cleanVolumeDirectories(targetDir, manga.getName());
