@@ -17,5 +17,15 @@ public class DownloadConfig {
      * is Mature flag needed
      */
     private boolean mature;
-    List<MangaProperties> mangaList;
+    /**
+     * filenames or parts with commercials and not related info
+     * if filename will contain this word as substring or will be equal
+     * such files will be skipped
+     */
+    private List<String> blacklist;
+    /**
+     * List of manga properties. One config could have more than one manga to load
+     * @see MangaProperties
+     */
+    private List<MangaProperties> mangaList;
 }

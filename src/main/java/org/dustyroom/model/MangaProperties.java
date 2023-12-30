@@ -21,4 +21,5 @@ public class MangaProperties {
      * check rm_h.servers in console on the site
      */
     private String fallbackDomain;
+    private Boolean compressionNeeded = false;
 }

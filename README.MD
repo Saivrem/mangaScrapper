@@ -4,14 +4,21 @@
 
 ```json
 {
-  "targetDir":"/path/to/dir/",
+  "targetDir": "/path/to/dir/",
   "mature": true,
+  "blacklist": [
+    "list","of","file","names","I",
+    "want","skip","e.g.","credits","help",
+    "and stuff not related to manga itself"
+  ],
   "mangaList": [
     {
       "mangaName": "mangaName",
       "mangaPageLink": "mangaLink",
-      "fallbackDomain": "fallbackDomain"
+      "fallbackDomain": "fallbackDomain",
+      "compressionNeeded": false
     }
   ]
 }
 ```
+**compressionNeeded** is a flag to indicate that chapters should be zipped, if set to true, everything except for zip archives will be removed once download is finished. 

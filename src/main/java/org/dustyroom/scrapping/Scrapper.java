@@ -37,6 +37,8 @@ public class Scrapper {
     private String mangaName;
     private String proxy;
     private String targetDir;
+    private List<String> blacklist;
+    private boolean archive;
 
     public void run() {
         LocalDateTime start = getCurrentTime();
@@ -52,12 +54,18 @@ public class Scrapper {
             }
             for (String chapterPage : getChapterPages(chapterLink)) {
                 String fileName = getFileName(chapterPage);
-                download(chapterPage, chapterFolder.resolve(fileName));
+                boolean notBlacklisted = blacklist.stream().noneMatch(fileName::contains);
+                if (notBlacklisted) {
+                    download(chapterPage, chapterFolder.resolve(fileName));
+                }
             }
-            zipChapter(chapterFolder);
+            if (archive) {
+                zipChapter(chapterFolder);
+            }
         }
-
-        cleanVolumeDirectories();
+        if (archive) {
+            cleanVolumeDirectories();
+        }
 
         LocalDateTime end = getCurrentTime();
         log.info("{} End loading {} to {}, time {}",

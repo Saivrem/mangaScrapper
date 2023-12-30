@@ -21,12 +21,14 @@ public class Main {
                 downloadConfig.getMangaList().stream()
                         .filter(Objects::nonNull)
                         .map(mangaProperties -> Scrapper.builder()
-                                                        .mangaName(mangaProperties.getMangaName())
-                                                        .mangaPageLink(mangaProperties.getMangaPageLink())
-                                                        .needMature(downloadConfig.isMature())
-                                                        .proxy(mangaProperties.getFallbackDomain())
-                                                        .targetDir(downloadConfig.getTargetDir())
-                                                        .build())
+                                .mangaName(mangaProperties.getMangaName())
+                                .mangaPageLink(mangaProperties.getMangaPageLink())
+                                .needMature(downloadConfig.isMature())
+                                .proxy(mangaProperties.getFallbackDomain())
+                                .targetDir(downloadConfig.getTargetDir())
+                                .blacklist(downloadConfig.getBlacklist())
+                                .archive(mangaProperties.getCompressionNeeded())
+                                .build())
                         .forEach(Scrapper::run);
             }
         } else {
