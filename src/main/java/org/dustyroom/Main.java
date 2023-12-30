@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.dustyroom.model.DownloadConfig;
-import org.dustyroom.model.MangaProperties;
+import org.dustyroom.model.Manga;
 import org.dustyroom.scrapping.Scrapper;
 
 import java.io.FileInputStream;
@@ -21,15 +21,12 @@ public class Main {
             if (downloadConfig != null) {
                 downloadConfig.getMangaList().stream()
                         .filter(Objects::nonNull)
-                        .filter(MangaProperties::isNeeded)
-                        .map(mangaProperties -> Scrapper.builder()
-                                .mangaName(mangaProperties.getMangaName())
-                                .mangaPageLink(mangaProperties.getMangaPageLink())
+                        .filter(Manga::isLoad)
+                        .map(manga -> Scrapper.builder()
+                                .manga(manga)
                                 .needMature(downloadConfig.isMature())
-                                .proxy(mangaProperties.getFallbackDomain())
                                 .targetDir(downloadConfig.getTargetDir())
                                 .blacklist(downloadConfig.getBlacklist())
-                                .archive(mangaProperties.getCompressionNeeded())
                                 .build())
                         .forEach(Scrapper::run);
             }

@@ -30,7 +30,7 @@ public class DownloadConfig {
     /**
      * List of manga properties. One config could have more than one manga to load
      *
-     * @see MangaProperties
+     * @see Manga
      */
-    private List<MangaProperties> mangaList;
+    private List<Manga> mangaList;
 }

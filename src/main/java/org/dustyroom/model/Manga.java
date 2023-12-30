@@ -5,22 +5,22 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MangaProperties {
+public class Manga {
 
     /**
      * the name of folder where content will be stored
      */
-    private String mangaName;
+    private String name;
     /**
      * Root manga page link
      */
-    private String mangaPageLink;
+    private String page;
     /**
      * sometimes original picture domain is protected,
      * you can set up proxy domain
      * check rm_h.servers in console on the site
      */
-    private String fallbackDomain;
-    private Boolean compressionNeeded = false;
-    private boolean needed;
+    private String server;
+    private boolean zip;
+    private boolean load;
 }
