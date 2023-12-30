@@ -23,12 +23,12 @@ public class LoadingTool {
         await(100);
 
         if (Files.exists(outputPath)) {
-            log.info("File exists: {}", getFileLoggingString(outputPath));
+            log.debug("File exists: {}", getFileLoggingString(outputPath));
             return;
         }
         try (InputStream in = new URL(link).openStream()) {
             Files.copy(in, outputPath, StandardCopyOption.REPLACE_EXISTING);
-            log.info("Downloaded: {}", getFileLoggingString(outputPath));
+            log.debug("Downloaded: {}", getFileLoggingString(outputPath));
         } catch (Exception e) {
             decodeAndLogException(e, "");
         }
