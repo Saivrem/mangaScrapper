@@ -1,5 +1,8 @@
 package org.dustyroom.scrapping;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +30,7 @@ import static org.dustyroom.utils.LoggingUtils.*;
 @Builder
 @Slf4j
 public class Scrapper {
-    private final List<String> initializers = List.of("rm_h.readerInit( ", "rm_h.initReader( ");
+    private final List<String> initializers = List.of(/*"rm_h.readerInit( ",*/ "rm_h.initReader( ", "rm_h.readerDoInit(");
 
     private boolean needMature;
     private String targetDir;
@@ -133,16 +136,23 @@ public class Scrapper {
     }
 
     private Set<String> extractPageLinks(String input, String proxy) {
+        ObjectMapper objectMapper = new ObjectMapper();
         Set<String> result = new TreeSet<>();
-        String arrayOfElementArraysString = input.substring(input.indexOf("[["), input.lastIndexOf("]]"));
-        for (String str : arrayOfElementArraysString.split("],\\[")) {
-            String cleanedString = str.replaceAll("[\\[\"']", "");
-            String[] elementArray = cleanedString.split(",");
-            String domain = (proxy != null) ? proxy : getFallbackIfNeeded(elementArray[0]);
-            String path = elementArray[2];
-            if (StringUtils.isNoneBlank(domain, path)) {
-                result.add(domain + path);
-            }
+
+        String stringifiedArray = input.substring(input.indexOf("[["), input.lastIndexOf("]]") + 2);
+        stringifiedArray = stringifiedArray.replaceAll("'", "\"");
+        try {
+            List<List<String>> testList = objectMapper.readValue(stringifiedArray, new TypeReference<>() {
+            });
+            testList.forEach(l -> {
+                String domain = (proxy != null) ? proxy : getFallbackIfNeeded(l.get(0));
+                String path = l.get(2);
+                if (StringUtils.isNoneBlank(domain, path)) {
+                    result.add(domain + path);
+                }
+            });
+        } catch (JsonProcessingException e) {
+            log.error("Error occured parsing chapters for {}", stringifiedArray);
         }
         return result;
     }
