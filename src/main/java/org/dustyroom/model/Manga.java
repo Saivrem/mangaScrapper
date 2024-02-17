@@ -17,7 +17,7 @@ public class Manga {
     private String page;
     /**
      * sometimes original picture domain is protected,
-     * you can set up proxy domain
+     * you can set up mirror domain
      * check rm_h.servers in console on the site
      */
     private String server;
