@@ -1,11 +1,7 @@
 package org.dustyroom.scrapping;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.dustyroom.model.Manga;
 import org.dustyroom.utils.FileUtils;
 import org.jsoup.Jsoup;
@@ -22,15 +18,16 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.dustyroom.scrapping.ForbiddenDomain.getFallbackIfNeeded;
 import static org.dustyroom.utils.FileUtils.*;
 import static org.dustyroom.utils.LoadingTool.download;
 import static org.dustyroom.utils.LoggingUtils.*;
+import static org.dustyroom.utils.ScrapperUtils.cleanHref;
+import static org.dustyroom.utils.ScrapperUtils.extractPageLinks;
 
 @Builder
 @Slf4j
 public class Scrapper {
-    private final List<String> initializers = List.of(/*"rm_h.readerInit( ",*/ "rm_h.initReader( ", "rm_h.readerDoInit(");
+    private final List<String> initializers = List.of("rm_h.initReader( ", "rm_h.readerDoInit(");
 
     private boolean needMature;
     private String targetDir;
@@ -123,37 +120,5 @@ public class Scrapper {
             decodeAndLogException(e, "Can't get chapters; {}");
             return Collections.emptySet();
         }
-    }
-
-    private String cleanHref(String href) {
-        if (href.contains("?")) {
-            href = href.substring(0, href.indexOf("?"));
-        }
-        if (href.contains(("#"))) {
-            href = href.substring(0, href.indexOf("#"));
-        }
-        return href;
-    }
-
-    private Set<String> extractPageLinks(String input, String proxy) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        Set<String> result = new TreeSet<>();
-
-        String stringifiedArray = input.substring(input.indexOf("[["), input.lastIndexOf("]]") + 2);
-        stringifiedArray = stringifiedArray.replaceAll("'", "\"");
-        try {
-            List<List<String>> testList = objectMapper.readValue(stringifiedArray, new TypeReference<>() {
-            });
-            testList.forEach(l -> {
-                String domain = (proxy != null) ? proxy : getFallbackIfNeeded(l.get(0));
-                String path = l.get(2);
-                if (StringUtils.isNoneBlank(domain, path)) {
-                    result.add(domain + path);
-                }
-            });
-        } catch (JsonProcessingException e) {
-            log.error("Error occured parsing chapters for {}", stringifiedArray);
-        }
-        return result;
     }
 }
