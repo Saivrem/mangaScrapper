@@ -3,7 +3,6 @@ package org.dustyroom.scrapping;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.dustyroom.model.Manga;
-import org.dustyroom.utils.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,11 +17,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.dustyroom.utils.DateUtils.*;
 import static org.dustyroom.utils.FileUtils.*;
-import static org.dustyroom.utils.LoadingTool.download;
-import static org.dustyroom.utils.LoggingUtils.*;
-import static org.dustyroom.utils.ScrapperUtils.cleanHref;
-import static org.dustyroom.utils.ScrapperUtils.extractPageLinks;
+import static org.dustyroom.utils.LoadingUtils.download;
+import static org.dustyroom.utils.LoggingUtils.decodeAndLogException;
+import static org.dustyroom.utils.ScrapperUtils.*;
 
 @Builder
 @Slf4j
@@ -37,8 +36,8 @@ public class Scrapper {
 
     public void run() {
         LocalDateTime start = getCurrentTime();
-        targetDir = FileUtils.prepareDirectoryOrDefault(targetDir, "mangaScrapping");
-        log.info("{} Star loading {} to {}", start, manga.getName(), targetDir);
+        targetDir = prepareDirectoryOrDefault(targetDir, "mangaScrapping");
+        log.info("{} Star loading {} to {}", format(start), manga.getName(), targetDir);
 
         for (String chapterLink : getChapters()) {
             Path chapterFolder = prepareChapterFolder(targetDir, manga.getName(), chapterLink);
@@ -62,7 +61,7 @@ public class Scrapper {
 
         LocalDateTime end = getCurrentTime();
         log.info("{} End loading {} to {}, time {}",
-                end,
+                format(end),
                 manga.getName(),
                 targetDir,
                 timePassed(start, end)

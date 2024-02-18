@@ -4,6 +4,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,6 +17,39 @@ import java.util.stream.Stream;
 public class ScrapperUtils {
 
     private final static int PAGE_ELEMENT_SIZE = 5;
+
+    private static final String s = File.separator;
+
+    public String prepareDirectoryOrDefault(String targetDir, String defaultDirectory) {
+        if (targetDir == null) {
+            return System.getProperty("user.home") + s + defaultDirectory + s;
+        }
+        return targetDir;
+    }
+
+    public String assembleFilename(String chapterPage) {
+        String rawName = chapterPage.substring(chapterPage.lastIndexOf("/") + 1);
+        if (rawName.contains("?")) {
+            rawName = rawName.substring(0, rawName.indexOf("?"));
+        }
+
+        StringBuilder fileNameBuilder = new StringBuilder();
+        StringBuilder extensionBuilder = new StringBuilder();
+
+        int extensionIndex = rawName.lastIndexOf(".");
+        char[] rawNameChars = rawName.toCharArray();
+        for (int i = extensionIndex - 1; i >= 0; i--) {
+            char current = rawNameChars[i];
+            if (!Character.isDigit(current)) continue;
+            fileNameBuilder.append(rawNameChars[i]);
+        }
+        for (int i = extensionIndex; i < rawNameChars.length; i++) {
+            char current = rawNameChars[i];
+            if (!Character.isLetter(current) && current != '.') break;
+            extensionBuilder.append(rawNameChars[i]);
+        }
+        return fileNameBuilder.isEmpty() ? rawName : fileNameBuilder.reverse() + extensionBuilder.toString();
+    }
 
     public static String buildPageLink(String mirror, List<String> l) {
         // Technically, each List passed here should have 5 arguments:

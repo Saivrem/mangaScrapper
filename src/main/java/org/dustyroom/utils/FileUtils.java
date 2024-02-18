@@ -3,7 +3,6 @@ package org.dustyroom.utils;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,13 +17,19 @@ import static org.dustyroom.utils.LoggingUtils.decodeAndLogException;
 @UtilityClass
 public class FileUtils {
 
-    private static final String s = File.separator;
-
-    public String prepareDirectoryOrDefault(String targetDir, String defaultDirectory) {
-        if (targetDir == null) {
-            return System.getProperty("user.home") + s + defaultDirectory + s;
+    public static void cleanVolumeDirectories(String targetDir, String mangaName) {
+        // TODO adjust file walking to archive and clean at the same time
+        try {
+            Path clean = Path.of(targetDir + mangaName);
+            Files.walk(clean).filter(Files::isDirectory).forEach(file -> {
+                try {
+                    Files.delete(file);
+                } catch (IOException ignore) {
+                }
+            });
+        } catch (IOException e) {
+            log.warn("Can't remove volume dir {}", e.getMessage());
         }
-        return targetDir;
     }
 
     /**
@@ -76,44 +81,5 @@ public class FileUtils {
             log.warn("Error during archiving {}", chapterFolder);
         }
         log.info("Chapter is zipped to {}", zipFilePath);
-    }
-
-    public static void cleanVolumeDirectories(String targetDir, String mangaName) {
-        // TODO adjust file walking to archive and clean at the same time
-        try {
-            Path clean = Path.of(targetDir + mangaName);
-            Files.walk(clean).filter(Files::isDirectory).forEach(file -> {
-                try {
-                    Files.delete(file);
-                } catch (IOException ignore) {
-                }
-            });
-        } catch (IOException e) {
-            log.warn("Can't remove volume dir {}", e.getMessage());
-        }
-    }
-
-    public String assembleFilename(String chapterPage) {
-        String rawName = chapterPage.substring(chapterPage.lastIndexOf("/") + 1);
-        if (rawName.contains("?")) {
-            rawName = rawName.substring(0, rawName.indexOf("?"));
-        }
-
-        StringBuilder fileNameBuilder = new StringBuilder();
-        StringBuilder extensionBuilder = new StringBuilder();
-
-        int extensionIndex = rawName.lastIndexOf(".");
-        char[] rawNameChars = rawName.toCharArray();
-        for (int i = extensionIndex - 1; i >= 0; i--) {
-            char current = rawNameChars[i];
-            if (!Character.isDigit(current)) continue;
-            fileNameBuilder.append(rawNameChars[i]);
-        }
-        for (int i = extensionIndex; i < rawNameChars.length; i++) {
-            char current = rawNameChars[i];
-            if (!Character.isLetter(current) && current != '.') break;
-            extensionBuilder.append(rawNameChars[i]);
-        }
-        return fileNameBuilder.isEmpty() ? rawName : fileNameBuilder.reverse() + extensionBuilder.toString();
     }
 }
