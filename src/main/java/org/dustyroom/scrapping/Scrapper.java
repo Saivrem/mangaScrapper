@@ -9,6 +9,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -34,22 +35,33 @@ public class Scrapper {
 
     private Manga manga;
 
+    private Path zipFileName;
+
     public void run() {
         LocalDateTime start = getCurrentTime();
-        targetDir = prepareDirectoryOrDefault(targetDir, "mangaScrapping");
+        targetDir = prepareDirectoryOrDefault(targetDir, "manga");
         log.info("{} Star loading {} to {}", format(start), manga.getName(), targetDir);
 
         for (String chapterLink : getChapters()) {
             Path chapterFolder = prepareChapterFolder(targetDir, manga.getName(), chapterLink);
+
             if (chapterFolder == null) {
+                log.warn("Chapter folder could not be created {}", chapterLink);
                 continue;
             }
+
+            if (manga.isZip() && Files.exists(zipFileName = createZipName(chapterFolder))) {
+                log.info("Chapter {} is already downloaded", zipFileName.getName(zipFileName.getNameCount() - 1));
+                continue;
+            }
+
             for (String chapterPage : getChapterPages(chapterLink)) {
                 String fileName = assembleFilename(chapterPage);
                 if (notBlacklisted(fileName)) {
                     download(chapterPage, chapterFolder.resolve(fileName));
                 }
             }
+
             if (manga.isZip()) {
                 zipChapter(chapterFolder);
             }

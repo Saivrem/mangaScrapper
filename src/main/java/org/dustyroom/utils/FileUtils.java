@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Comparator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -21,12 +22,16 @@ public class FileUtils {
         // TODO adjust file walking to archive and clean at the same time
         try {
             Path clean = Path.of(targetDir + mangaName);
-            Files.walk(clean).filter(Files::isDirectory).forEach(file -> {
-                try {
-                    Files.delete(file);
-                } catch (IOException ignore) {
-                }
-            });
+            Files.walk(clean)
+                    .filter(Files::isDirectory)
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException ioException) {
+                            log.warn("Can't remove volume dir {}", ioException.getMessage());
+                        }
+                    });
         } catch (IOException e) {
             log.warn("Can't remove volume dir {}", e.getMessage());
         }
@@ -58,7 +63,7 @@ public class FileUtils {
     }
 
     public static void zipChapter(Path chapterFolder) {
-        Path zipFilePath = Path.of(chapterFolder.getParent().toString() + "-ch" + chapterFolder.getFileName().toString() + ".zip");
+        Path zipFilePath = createZipName(chapterFolder);
         try (FileOutputStream fos = new FileOutputStream(zipFilePath.toFile());
              ZipOutputStream zos = new ZipOutputStream(fos)) {
             Files.walk(chapterFolder)
@@ -81,5 +86,9 @@ public class FileUtils {
             log.warn("Error during archiving {}", chapterFolder);
         }
         log.info("Chapter is zipped to {}", zipFilePath);
+    }
+
+    public static Path createZipName(Path chapterFolder) {
+        return Path.of(chapterFolder.getParent().toString() + "-ch" + chapterFolder.getFileName().toString() + ".zip");
     }
 }
