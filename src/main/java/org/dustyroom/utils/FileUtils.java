@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -19,11 +20,9 @@ import static org.dustyroom.utils.LoggingUtils.decodeAndLogException;
 public class FileUtils {
 
     public static void cleanVolumeDirectories(String targetDir, String mangaName) {
-        // TODO adjust file walking to archive and clean at the same time
-        try {
-            Path clean = Path.of(targetDir + mangaName);
-            Files.walk(clean)
-                    .filter(Files::isDirectory)
+        Path clean = Path.of(targetDir + mangaName);
+        try (Stream<Path> folders = Files.walk(clean)) {
+            folders.filter(Files::isDirectory)
                     .sorted(Comparator.reverseOrder())
                     .forEach(path -> {
                         try {
@@ -65,9 +64,9 @@ public class FileUtils {
     public static void zipChapter(Path chapterFolder) {
         Path zipFilePath = createZipName(chapterFolder);
         try (FileOutputStream fos = new FileOutputStream(zipFilePath.toFile());
-             ZipOutputStream zos = new ZipOutputStream(fos)) {
-            Files.walk(chapterFolder)
-                    .filter(Files::isRegularFile)
+             ZipOutputStream zos = new ZipOutputStream(fos);
+             Stream<Path> files = Files.walk(chapterFolder)) {
+            files.filter(Files::isRegularFile)
                     .forEach(file -> {
                         try {
                             Path relativePath = chapterFolder.relativize(file);
